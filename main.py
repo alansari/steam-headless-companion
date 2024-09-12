@@ -16,7 +16,7 @@ def get_current_time():
 
 def meta():
     title = "Steam Headless"
-    meta_description = "Compainion Appp"
+    meta_description = "Companion App"
     meta_keywords = "web, steam, headless, sunshine, python, FastHTML"
     return f"""
     <!DOCTYPE html>
@@ -29,7 +29,6 @@ def meta():
         <meta name="keywords" content="{meta_keywords}">
     </head>
     """
-
 def SidebarItem(text, hx_get, hx_target, **kwargs):
     return Div(
         I(cls=f'bi bi-{text}'),
@@ -48,7 +47,7 @@ def Sidebar(sidebar_items, hx_get, hx_target):
         id='sidebar',
         cls='collapse collapse-horizontal show border-end')
 
-sidebar_items = ('WebUI', 'Services', 'Installers', 'Sunshine Manager', 'FAQ')
+sidebar_items = ('WebUI', 'Sunshine WebUI', 'Services', 'Installers', 'Sunshine Manager', 'FAQ')
 
 @rt('/')
 def get():
@@ -64,9 +63,9 @@ def get():
                 Div(
                   Div(
                     Div(
-                    H1("Welcome the Steam Headless!"),
+                    H1("Welcome to Steam Headless!"),
                     P("Select an Item to get started"),
-                    id="current-menu-content"),
+                    id="current-menu-content", style="width: 100%; height: 100vh;"),
                     cls='col-12'
                 ), cls='row'),
                 cls='col ps-md-2 pt-2'),
@@ -76,7 +75,8 @@ def get():
 @rt('/menucontent')
 def menucontent(menu: str):
     switch_cases = {
-        'WebUI': f'<iframe src="http://192.168.100.131:8083" width="100%" height="800px" style="border:none;"></iframe>',
+        'WebUI': f'<iframe src="http://192.168.100.131:8083" width="100%" height="100%" style="border:none;" allow-insecure></iframe>',
+        'Sunshine WebUI': f'<iframe src="https://192.168.100.131:47990" width="100%" height="100%" style="border:none;"></iframe>',
         'Services': Div("Content for Services"),
         'Installers': Div("Content for Installers"),
         'Sunshine Manager': Div("Content for Sunshine Manager"),
