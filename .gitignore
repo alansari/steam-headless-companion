@@ -1,0 +1,28 @@
+# Python specific
+*.pyc
+__pycache__
+*.log
+*.tmp
+*.db
+*.sqlite3
+*.env
+*.lock
+*.cfg
+*.ini
+*.out
+*.xls*
+*.xlsx*
+*.pptx*
+.env
+.venv
+venv
+.pytest_cache
+.coverage
+.DS_Store
+.idea
+.vscode
+__pycache__
+*.py[cod]
+*~
+# Distracted from the main directory
+!.gitignore
