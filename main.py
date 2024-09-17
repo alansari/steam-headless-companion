@@ -72,15 +72,43 @@ def get():
             cls='row flex-nowrap'),
         cls='container-fluid')
 
+def services_content():
+    return Div(
+        H1("Services"),
+        P("Here you can manage your services."),
+        cls='container'
+    )
+
+def installers_content():
+    return Div(
+        H1("Installers"),
+        P("Here you can manage your installers."),
+        cls='container'
+    )
+
+def sunshine_manager_content():
+    return Div(
+        H1("Sunshine Manager"),
+        P("Here you can manage your Sunshine."),
+        cls='container'
+    )
+
+def faq_content():
+    return Div(
+        H1("FAQ"),
+        P("Here you can find answers to frequently asked questions."),
+        cls='container'
+    )
+
 @rt('/menucontent')
 def menucontent(menu: str):
     switch_cases = {
         'WebUI': f'<iframe src="http://192.168.100.131:8083" width="100%" height="100%" style="border:none;" allow-insecure></iframe>',
-        'Sunshine WebUI': f'<iframe src="https://192.168.100.131:47990" width="100%" height="100%" style="border:none;"></iframe>',
-        'Services': Div("Content for Services"),
-        'Installers': Div("Content for Installers"),
-        'Sunshine Manager': Div("Content for Sunshine Manager"),
-        'FAQ': Div("Content for FAQ")
+        'Sunshine WebUI': f'<iframe src="https://192.168.100.131:47990" width="100%" height="100%" style="border:none; allow-insecure"></iframe>',
+        'Services': services_content(),
+        'Installers': installers_content(),
+        'Sunshine Manager': sunshine_manager_content(),
+        'FAQ': faq_content()
     }
     
     return switch_cases.get(menu, Div("No content available"))
