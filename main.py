@@ -1,4 +1,5 @@
 from fasthtml.common import *
+from markupsafe import *
 import os
 import time
 
@@ -73,11 +74,18 @@ def get():
         cls='container-fluid')
 
 def services_content():
-    return Div(
-        H1("Services"),
-        P("Here you can manage your services."),
-        cls='container'
-    )
+    logs_dir = "/home/default/.cache/log"
+    log_files = [f for f in os.listdir(logs_dir) if os.path.isfile(os.path.join(logs_dir, f)) and f.endswith('.log')]
+    
+    divs = []
+    for log_file in log_files:
+        file_path = os.path.join(logs_dir, log_file)
+        with open(file_path, 'r') as file:
+            lines = file.readlines()[-50:] 
+            content = "<br>".join(lines)
+            divs.append(Div(H1(escape(log_file)), P(Markup(content)), cls='container'))
+    
+    return Div(*divs) if divs else Div("No log files found.")
 
 def installers_content():
     return Div(
