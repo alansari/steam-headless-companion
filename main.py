@@ -10,7 +10,7 @@ bootstrap_links = [
     Link(href=cdn+"-icons@1.11.3/font/bootstrap-icons.min.css", rel="stylesheet")
 ]
 
-app,rt = fast_app('data/gamedb.db', game_id='int', game_name="str", game_added='bool', pk='game_id' live=True, hdrs=bootstrap_links)
+app,rt = fast_app('data/gamedb.db', game_id=int, game_name=str, game_added=bool, pk='game_id', live=True, hdrs=bootstrap_links)
 
 def get_current_time():
     return time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
