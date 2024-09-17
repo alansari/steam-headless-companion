@@ -1,5 +1,6 @@
 from fasthtml.common import *
 from markupsafe import *
+#from steamfiles import acf
 import os
 import time
 
@@ -93,6 +94,19 @@ def installers_content():
         P("Here you can manage your installers."),
         cls='container'
     )
+
+#def list_installed_steam_games(directory):
+#    for filename in os.listdir(directory):
+#        if filename.endswith('.acf'):
+#            file_path = os.path.join(directory, filename)
+#            with open(file_path, 'rb') as f:
+#                data = acf.load(f)
+#                app_id = data.get('app_id')
+#                game_name = data.get('name')
+#                if app_id in games:
+#                    continue
+#                else:
+#                    games.insert(app_id, game_name, false)
 
 def sunshine_manager_content():
     return Div(
