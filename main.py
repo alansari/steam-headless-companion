@@ -48,7 +48,7 @@ def Sidebar(sidebar_items, hx_get, hx_target):
         id='sidebar',
         cls='collapse collapse-horizontal show border-end')
 
-sidebar_items = ('WebUI', 'Sunshine WebUI', 'Services', 'Installers', 'Sunshine Manager', 'FAQ')
+sidebar_items = ('WebUI', 'Sunshine WebUI', 'Logs', 'Installers', 'Sunshine Manager', 'FAQ')
 
 @rt('/')
 def get():
@@ -73,7 +73,7 @@ def get():
             cls='row flex-nowrap'),
         cls='container-fluid')
 
-def services_content():
+def logs_content():
     logs_dir = "/home/default/.cache/log"
     log_files = [f for f in os.listdir(logs_dir) if os.path.isfile(os.path.join(logs_dir, f)) and f.endswith('.log')]
     
@@ -113,7 +113,7 @@ def menucontent(menu: str):
     switch_cases = {
         'WebUI': f'<iframe src="http://192.168.100.131:8083" width="100%" height="100%" style="border:none;" allow-insecure></iframe>',
         'Sunshine WebUI': f'<iframe src="https://192.168.100.131:47990" width="100%" height="100%" style="border:none; allow-insecure"></iframe>',
-        'Services': services_content(),
+        'Logs': logs_content(),
         'Installers': installers_content(),
         'Sunshine Manager': sunshine_manager_content(),
         'FAQ': faq_content()
