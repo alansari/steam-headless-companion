@@ -89,11 +89,14 @@ def logs_content():
     return Div(*divs) if divs else Div("No log files found.")
 
 def installers_content():
-    return Div(
-        H1("Installers"),
-        P("Here you can manage your installers."),
-        cls='container'
-    )
+    installer_dir = "/home/default/.cache/installers"
+    installers = [f for f in os.listdir(installer_dir) if os.path.isfile(os.path.join(installer_dir, f)) and f.endswith('.sh')]
+
+    divs = []
+    for installer in installers:
+        divs.append(Button(installer, onclick=f"deleteInstaller('{installer}')", cls='btn btn-danger me-2'))
+
+    return Div(*divs) if divs else Div("No installers found.")
 
 #def list_installed_steam_games(directory):
 #    for filename in os.listdir(directory):
@@ -101,12 +104,12 @@ def installers_content():
 #            file_path = os.path.join(directory, filename)
 #            with open(file_path, 'rb') as f:
 #                data = acf.load(f)
-#                app_id = data.get('app_id')
+#                game_id = data.get('game_id')
 #                game_name = data.get('name')
-#                if app_id in games:
+#                if game_id in games:
 #                    continue
 #                else:
-#                    games.insert(app_id, game_name, false)
+#                    games.insert(game_id, game_name, false)
 
 def sunshine_manager_content():
     return Div(
