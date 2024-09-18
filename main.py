@@ -1,8 +1,8 @@
 from fasthtml.common import *
 from markupsafe import *
 #from steamfiles import acf
+import re
 import os
-import time
 
 cdn = 'https://cdn.jsdelivr.net/npm/bootstrap'
 bootstrap_links = [
@@ -10,27 +10,11 @@ bootstrap_links = [
     Script(src=cdn+"@5.3.3/dist/js/bootstrap.bundle.min.js"),
     Link(href=cdn+"-icons@1.11.3/font/bootstrap-icons.min.css", rel="stylesheet")
 ]
-
+title = "Steam Headless"
+meta_description = "Companion App"
+meta_keywords = "web, steam, headless, sunshine, python, FastHTML"
 app,rt,gamedb,games = fast_app('data/gamedb.db', game_id=int, game_name=str, game_added=bool, pk='game_id', live=True, hdrs=bootstrap_links)
 
-def get_current_time():
-    return time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-
-def meta():
-    title = "Steam Headless"
-    meta_description = "Companion App"
-    meta_keywords = "web, steam, headless, sunshine, python, FastHTML"
-    return f"""
-    <!DOCTYPE html>
-    <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>{title}</title>
-        <meta name="description" content="{meta_description}">
-        <meta name="keywords" content="{meta_keywords}">
-    </head>
-    """
 def SidebarItem(text, hx_get, hx_target, **kwargs):
     return Div(
         I(cls=f'bi bi-{text}'),
@@ -82,10 +66,10 @@ def logs_content():
     for log_file in log_files:
         file_path = os.path.join(logs_dir, log_file)
         with open(file_path, 'r') as file:
-            lines = file.readlines()[-50:] 
+            lines = file.readlines()[-50:]
             content = "<br>".join(lines)
-            divs.append(Div(H1(escape(log_file)), P(Markup(content)), cls='container'))
-    
+            divs.append(Details(Summary(escape(log_file), role='button'), P(Markup(content), cls='card')))
+
     return Div(*divs) if divs else Div("No log files found.")
 
 def installers_content():
@@ -94,27 +78,33 @@ def installers_content():
 
     divs = []
     for installer in installers:
-        divs.append(Button(installer, onclick=f"deleteInstaller('{installer}')", cls='btn btn-danger me-2'))
+        divs.append(Button(installer, onclick=f"fireScript('{installer}')", cls='btn btn-primary me-2 group'))
 
     return Div(*divs) if divs else Div("No installers found.")
 
-#def list_installed_steam_games(directory):
-#    for filename in os.listdir(directory):
-#        if filename.endswith('.acf'):
-#            file_path = os.path.join(directory, filename)
-#            with open(file_path, 'rb') as f:
-#                data = acf.load(f)
-#                game_id = data.get('game_id')
-#                game_name = data.get('name')
-#                if game_id in games:
-#                    continue
-#                else:
-#                    games.insert(game_id, game_name, false)
+def get_installed_steam_games(directory):
+    for filename in os.listdir(directory):
+        if filename.endswith('.acf'):
+            acf_path = os.path.join(directory, filename)
+            with open(acf_path, 'r', encoding='utf-8') as acf_file:
+                content = acf_file.read()
+                game_id_match = re.search(r'"appid"\s*:\s*"(\d+)"', content)
+                if game_id_match:
+                    game_id = game_id_match.group(1)
+                    name_match = re.search(r'"name"\s*:\s*"([^"]+)"', content)
+                    if name_match:
+                        game_name = name_match.group(1)
+                        if game_id in games:
+                            continue
+                        else:
+                            games.insert(game_id, game_name, false)
 
 def sunshine_manager_content():
+    #get_installed_steam_games("/mnt/games/SteamLibrary/steamapps")
     return Div(
         H1("Sunshine Manager"),
-        P("Here you can manage your Sunshine."),
+        Button("Start Sunshine", onclick="startSunshine()", cls='btn btn-primary me-2'),
+        Button("Stop Sunshine", onclick="stopSunshine()", cls='btn btn-danger me-2'),
         cls='container'
     )
 
@@ -128,14 +118,14 @@ def faq_content():
 @rt('/menucontent')
 def menucontent(menu: str):
     switch_cases = {
-        'WebUI': f'<iframe src="http://192.168.100.131:8083" width="100%" height="100%" style="border:none;" allow-insecure></iframe>',
+        'WebUI': f'<iframe src="http://192.168.100.131:8083" width="100%" height="100%" style="border:none;"></iframe>',
         'Sunshine WebUI': f'<iframe src="https://192.168.100.131:47990" width="100%" height="100%" style="border:none; allow-insecure"></iframe>',
         'Logs': logs_content(),
         'Installers': installers_content(),
         'Sunshine Manager': sunshine_manager_content(),
         'FAQ': faq_content()
     }
-    
+
     return switch_cases.get(menu, Div("No content available"))
 
 serve(port=8082)
