@@ -1,6 +1,5 @@
 from fasthtml.common import *
 from markupsafe import *
-#from steamfiles import acf
 import re
 import os
 
@@ -78,26 +77,28 @@ def installers_content():
 
     divs = []
     for installer in installers:
-        divs.append(Button(installer, onclick=f"fireScript('{installer}')", cls='btn btn-primary me-2 group'))
+        divs.append(Button(installer, onclick=f"fireScript('{installer}')", cls='btn btn-primary me-2 card container'))
 
     return Div(*divs) if divs else Div("No installers found.")
 
-def get_installed_steam_games(directory):
-    for filename in os.listdir(directory):
-        if filename.endswith('.acf'):
-            acf_path = os.path.join(directory, filename)
-            with open(acf_path, 'r', encoding='utf-8') as acf_file:
-                content = acf_file.read()
-                game_id_match = re.search(r'"appid"\s*:\s*"(\d+)"', content)
-                if game_id_match:
-                    game_id = game_id_match.group(1)
-                    name_match = re.search(r'"name"\s*:\s*"([^"]+)"', content)
-                    if name_match:
-                        game_name = name_match.group(1)
-                        if game_id in games:
-                            continue
-                        else:
-                            games.insert(game_id, game_name, false)
+# def get_installed_steam_games(directory):
+    # for filename in os.listdir(directory):
+    #     if filename.endswith('.acf'):
+    #         acf_path = os.path.join(directory, filename)
+    #         with open(acf_path, 'r', encoding='utf-8') as acf_file:
+    #             content = acf_file.read()
+    #             game_id_match = re.search(r'"appid"\s*:\s*"(\d+)"', content)
+    #             if game_id_match:
+    #                 game_id = game_id_match.group(1)
+    #                 name_match = re.search(r'"name"\s*:\s*"([^"]+)"', content)
+    #                 if name_match:
+    #                     game_name = name_match.group(1)
+    #                     if game_id in games:
+    #                         continue
+    #                     else:
+    #                         games.insert(game_id, game_name, false)
+                            # games.update()
+                            # print(f"Installed game: {game_name} (ID: {game_id})")
 
 def sunshine_manager_content():
     #get_installed_steam_games("/mnt/games/SteamLibrary/steamapps")

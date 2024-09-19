@@ -28,3 +28,4 @@ __pycache__
 *~
 # Distracted from the main directory
 !.gitignore
+main2.py
