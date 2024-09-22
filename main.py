@@ -13,8 +13,8 @@ title = "Steam Headless"
 meta_description = "Companion App"
 meta_keywords = "web, steam, headless, sunshine, python, FastHTML"
 
-def render(game):
-    games = Game.select()
+def render(games):
+    games = Games.select()
     rows = []
     for game in games:
         row = Div(
@@ -23,7 +23,8 @@ def render(game):
             A('Delete', href=f'/delete/{game.game_id}', classes='btn btn-error')
         )
         rows.append(row)
-    return Div(*rows, classes='grid grid-cols-1 gap-4')
+    #return Div(*rows, classes='grid grid-cols-1 gap-4')
+    return Div(*rows, classes='card gap-4')
 
 def SidebarItem(text, hx_get, hx_target, **kwargs):
     return Div(
@@ -101,6 +102,8 @@ def sunshine_manager_content():
         Button("Start Sunshine", onclick="startSunshine()", cls='btn btn-primary me-2'),
         Button("Stop Sunshine", onclick="stopSunshine()", cls='btn btn-danger me-2'),
         cls='container'
+    ), Div(
+        gamedb()
     )
 
 def faq_content():
