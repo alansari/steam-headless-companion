@@ -12,6 +12,30 @@ bootstrap_links = [
 title = "Steam Headless"
 meta_description = "Companion App"
 meta_keywords = "web, steam, headless, sunshine, python, FastHTML"
+
+# How to render elements from sqlite database
+def render(Game):
+    games = Game.select()
+    rows = []
+    for game in games:
+        row = Div(
+            H3(game.game_name),
+            P('Added: ' + str(game.game_added)),
+            A('Delete', href=f'/delete/{game.game_id}', classes='btn btn-error')
+        )
+        rows.append(row)
+    return Div(*rows, classes='grid grid-cols-1 gap-4')
+
+# Define the FastHTML app with database initialization/load, routing, rendering, ***and builtin pico/bootstrap CSS theme hdrs=pico-links
+app,rt,gamedb,games = fast_app('data/gamedb.db', 
+    game_id=int, 
+    game_name=str, 
+    game_added=bool, pk='game_id', 
+    live=True, 
+    render=render,
+    hdrs=bootstrap_links
+)
+
 app,rt,gamedb,games = fast_app('data/gamedb.db', game_id=int, game_name=str, game_added=bool, pk='game_id', live=True, hdrs=bootstrap_links)
 
 def SidebarItem(text, hx_get, hx_target, **kwargs):
@@ -34,6 +58,7 @@ def Sidebar(sidebar_items, hx_get, hx_target):
 
 sidebar_items = ('WebUI', 'Sunshine WebUI', 'Logs', 'Installers', 'Sunshine Manager', 'FAQ')
 
+# This whole section to be replaced by layout() function in the future.
 @rt('/')
 def get():
     return Div(
@@ -99,6 +124,42 @@ def installers_content():
     #                         games.insert(game_id, game_name, false)
                             # games.update()
                             # print(f"Installed game: {game_name} (ID: {game_id})")
+
+# Define the HTML layout using fasthtml built-in pico-css and bootstrap test
+def layout():
+    return Body(
+        Header('Steam-Headless', 
+            dir='rtl',
+            cls='container-fluid', 
+            style="border-style: dotted; border-color: white"
+        ),
+        Main(
+            Button(
+                    "Menu",
+                    cls='aria-controls=sidebar, aria-expanded=false',
+                    onlclick='aria-controls="sidebar" aria-expanded="true"',
+                ),
+            Aside(
+                Nav(
+                    Ul(Li(*[A(item, href=f'/{re.sub(" ", "-", item)}') for item in sidebar_items])),
+                    cls='nav flex-column'
+                ),
+                cls='sidebar aria-label=sidebar position-fixed top-0 start-0 vh-100 bg-light shadow'
+            ),
+            Div(
+                H1('Hello'),
+                cls='',
+                style='background-color: blue'
+            ),
+            cls='container-fluid',
+            style="border-style: dotted; border-color: white"
+        ),
+        Footer('Footer',
+            cls='container-fluid',
+            style="border-style: dotted; border-color: white"
+        ),
+        cls='container-fluid'
+    )
 
 def sunshine_manager_content():
     #get_installed_steam_games("/mnt/games/SteamLibrary/steamapps")
