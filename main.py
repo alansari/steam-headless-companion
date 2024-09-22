@@ -36,8 +36,6 @@ app,rt,gamedb,games = fast_app('data/gamedb.db',
     hdrs=bootstrap_links
 )
 
-app,rt,gamedb,games = fast_app('data/gamedb.db', game_id=int, game_name=str, game_added=bool, pk='game_id', live=True, hdrs=bootstrap_links)
-
 def SidebarItem(text, hx_get, hx_target, **kwargs):
     return Div(
         I(cls=f'bi bi-{text}'),
@@ -106,24 +104,22 @@ def installers_content():
 
     return Div(*divs) if divs else Div("No installers found.")
 
-# def get_installed_steam_games(directory):
-    # for filename in os.listdir(directory):
-    #     if filename.endswith('.acf'):
-    #         acf_path = os.path.join(directory, filename)
-    #         with open(acf_path, 'r', encoding='utf-8') as acf_file:
-    #             content = acf_file.read()
-    #             game_id_match = re.search(r'"appid"\s*:\s*"(\d+)"', content)
-    #             if game_id_match:
-    #                 game_id = game_id_match.group(1)
-    #                 name_match = re.search(r'"name"\s*:\s*"([^"]+)"', content)
-    #                 if name_match:
-    #                     game_name = name_match.group(1)
-    #                     if game_id in games:
-    #                         continue
-    #                     else:
-    #                         games.insert(game_id, game_name, false)
-                            # games.update()
-                            # print(f"Installed game: {game_name} (ID: {game_id})")
+def get_installed_steam_games(directory):
+    for filename in os.listdir(directory):
+        if filename.endswith('.acf'):
+            acf_path = os.path.join(directory, filename)
+            with open(acf_path, 'r', encoding='utf-8') as acf_file:
+                content = acf_file.read()
+                game_id_match = re.search(r'"appid"\s*:\s*"(\d+)"', content)
+                if game_id_match:
+                    game_id = game_id_match.group(1)
+                    name_match = re.search(r'"name"\s*:\s*"([^"]+)"', content)
+                    if name_match:
+                        game_name = name_match.group(1)
+                        if game_id in games:
+                            continue
+                        else:
+                            games.insert(game_id, game_name, false)
 
 # Define the HTML layout using fasthtml built-in pico-css and bootstrap test
 def layout():
