@@ -12,7 +12,18 @@ bootstrap_links = [
 title = "Steam Headless"
 meta_description = "Companion App"
 meta_keywords = "web, steam, headless, sunshine, python, FastHTML"
-app,rt,gamedb,games = fast_app('data/gamedb.db', game_id=int, game_name=str, game_added=bool, pk='game_id', live=True, hdrs=bootstrap_links)
+
+def render(game):
+    games = Game.select()
+    rows = []
+    for game in games:
+        row = Div(
+            H3(game.game_name + (' SM' if game.game_added else ' NA')),
+            A('Add', href=f'/add/{game.game_id}', classes='btn btn-primary'),
+            A('Delete', href=f'/delete/{game.game_id}', classes='btn btn-error')
+        )
+        rows.append(row)
+    return Div(*rows, classes='grid grid-cols-1 gap-4')
 
 def SidebarItem(text, hx_get, hx_target, **kwargs):
     return Div(
@@ -34,28 +45,13 @@ def Sidebar(sidebar_items, hx_get, hx_target):
 
 sidebar_items = ('WebUI', 'Sunshine WebUI', 'Logs', 'Installers', 'Sunshine Manager', 'FAQ')
 
-@rt('/')
-def get():
-    return Div(
-        Div(
-            Div(
-                Sidebar(sidebar_items, hx_get='menucontent', hx_target='#current-menu-content'),
-                cls='col-auto px-0'),
-            Main(
-                A(I(cls='bi bi-list bi-lg py-2 p-1'), 'Menu',
-                  href='#', data_bs_target='#sidebar', data_bs_toggle='collapse', aria_expanded='false', aria_controls='sidebar',
-                  cls='border rounded-3 p-1 text-decoration-none'),
-                Div(
-                  Div(
-                    Div(
-                    H1("Welcome to Steam Headless!"),
-                    P("Select an Item to get started"),
-                    id="current-menu-content", style="width: 100%; height: 100vh;"),
-                    cls='col-12'
-                ), cls='row'),
-                cls='col ps-md-2 pt-2'),
-            cls='row flex-nowrap'),
-        cls='container-fluid')
+app,rt,gamedb,Games = fast_app('data/gamedb.db', 
+    game_id=int, 
+    game_name=str, 
+    game_added=bool, pk='game_id', 
+    live=True, 
+    render=render,
+    hdrs=bootstrap_links)
 
 def logs_content():
     logs_dir = "/home/default/.cache/log"
@@ -81,24 +77,22 @@ def installers_content():
 
     return Div(*divs) if divs else Div("No installers found.")
 
-# def get_installed_steam_games(directory):
-    # for filename in os.listdir(directory):
-    #     if filename.endswith('.acf'):
-    #         acf_path = os.path.join(directory, filename)
-    #         with open(acf_path, 'r', encoding='utf-8') as acf_file:
-    #             content = acf_file.read()
-    #             game_id_match = re.search(r'"appid"\s*:\s*"(\d+)"', content)
-    #             if game_id_match:
-    #                 game_id = game_id_match.group(1)
-    #                 name_match = re.search(r'"name"\s*:\s*"([^"]+)"', content)
-    #                 if name_match:
-    #                     game_name = name_match.group(1)
-    #                     if game_id in games:
-    #                         continue
-    #                     else:
-    #                         games.insert(game_id, game_name, false)
-                            # games.update()
-                            # print(f"Installed game: {game_name} (ID: {game_id})")
+def get_installed_steam_games(directory):
+    for filename in os.listdir(directory):
+        if filename.endswith('.acf'):
+            acf_path = os.path.join(directory, filename)
+            with open(acf_path, 'r', encoding='utf-8') as acf_file:
+                content = acf_file.read()
+                game_id_match = re.search(r'"appid"\s*:\s*"(\d+)"', content)
+                if game_id_match:
+                    game_id = game_id_match.group(1)
+                    name_match = re.search(r'"name"\s*:\s*"([^"]+)"', content)
+                    if name_match:
+                        game_name = name_match.group(1)
+                        if game_id in games:
+                            continue
+                        else:
+                            games.insert(game_id, game_name, false)
 
 def sunshine_manager_content():
     #get_installed_steam_games("/mnt/games/SteamLibrary/steamapps")
@@ -116,6 +110,29 @@ def faq_content():
         cls='container'
     )
 
+@rt('/')
+def get():
+    return Div(
+        Div(
+            Div(
+                Sidebar(sidebar_items, hx_get='menucontent', hx_target='#current-menu-content'),
+                cls='col-auto px-0'),
+            Main(
+                A(I(cls='bi bi-list bi-lg py-2 p-1'), 'Menu',
+                  href='#', data_bs_target='#sidebar', data_bs_toggle='collapse', aria_expanded='false', aria_controls='sidebar',
+                  cls='border rounded-3 p-1 text-decoration-none'),
+                Div(
+                  Div(
+                    Div(
+                    H1("Welcome to Steam Headless!"),
+                    P("Select an Item to get started"),
+                    id="current-menu-content", style="width: 100%; height: 100vh;"),
+                    cls='col-12'
+                ), cls='row'),
+                cls='col ps-md-2 pt-2'),
+            cls='row flex-nowrap'),
+        cls='container-fluid')
+
 @rt('/menucontent')
 def menucontent(menu: str):
     switch_cases = {
@@ -128,5 +145,19 @@ def menucontent(menu: str):
     }
 
     return switch_cases.get(menu, Div("No content available"))
+
+@rt('/delete/{game_id}')
+def get(game_id):
+    game = Games[game_id]
+    game.game_added = False
+    gamedb.update(game)
+    return game
+
+@rt('/add/{game_id}')
+def get(game_id):
+    game = Games[game_id]
+    game.game_added = True
+    gamedb.update(game)
+    return game
 
 serve(port=8082)
