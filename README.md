@@ -1,4 +1,3 @@
 Proof of concept for a possible way to manage steam-headless
 
-
-[POC.webm](https://github.com/user-attachments/assets/fa79fc91-8aa2-46e9-bdc5-9f1d48a4d8da)
+[FastHTML page - Google Chrome 2024-09-22 11-45-46.webm](https://github.com/user-attachments/assets/e475bc1f-ebf0-4280-95e5-d9f8931b5650)
