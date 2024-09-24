@@ -84,7 +84,7 @@ def logs_content():
         with open(file_path, 'r') as file:
             lines = file.readlines()[-50:]
             content = "<br>".join(lines)
-            divs.append(Details(Summary(escape(log_file), role='button'), P(Markup(content), cls='card')))
+            divs.append(Details(Summary(escape(log_file), role='button'), Pre(P(Markup(content)), cls='card')))
 
     return Div(*divs) if divs else Div("No log files found.")
 
@@ -100,35 +100,42 @@ def installers_content():
 
     return Div(*divs) if divs else Div("No installers found.")
 
-# Function to populate SQLite database with Steam games
-def get_installed_steam_games(directory):
+# The GameDB content is defined here
+def get_installed_steam_games(steam_dir):
     games = gamedb()
-    for filename in os.listdir(directory):
+    for filename in os.listdir(steam_dir):
         if filename.endswith('.acf'):
-            acf_path = os.path.join(directory, filename)
-            with open(acf_path, 'r', encoding='utf-8') as acf_file:
-                content = acf_file.read()
-                game_id_match = re.search(r'"appid"\s*:\s*"(\d+)"', content)
-                if game_id_match:
-                    _game_id = game_id_match.group(1)
-                    name_match = re.search(r'"name"\s*:\s*"([^"]+)"', content)
-                    if name_match:
-                        _game_name = name_match.group(1)
-                        if _game_id in games:
-                            continue
-                        else:
-                            gamedb.insert(Game(
-                                game_id=_game_id, 
-                                game_name=_game_name, 
-                                game_added=false
-                            ))
+            acf_file = os.path.join(steam_dir, filename)
+            with open(acf_file, 'r', encoding='utf-8') as f:
+                acf_content = f.read()
+                appid_match = re.search(r'"appid"\s+"(\d+)"', acf_content)
+            
+                if appid_match:
+                    appid = int(appid_match.group(1))
+                    game_name_match = re.search(r'"name"\s+"([^"]+)"', acf_content)
+                    if game_name_match:
+                        game_name = game_name_match.group(1)
+                        # if gamedb[appid]:
+                        #     continue
+                        # else:
+                        gamedb.insert(Game(
+                            game_id=appid,
+                            game_name=game_name,
+                            game_added=False
+                        ))
 
 # The Sunshine Manager Page content is defined here
 # Todo seperate the page into a different file
 def sunshine_manager_content():
+    # gamedb.insert(Game(
+    #     game_id=123456,
+    #     game_name="Placeholder",
+    #     game_added=False
+    # ))
+    
     _reload = Button( 
         "Reload Steam Games",
-        onclick=get_installed_steam_games('/mnt/games/SteamLibrary/steamapps'),
+        #onclick=get_installed_steam_games('/mnt/games/SteamLibrary/steamapps'),
         cls='btn btn-primary container rtl'
     )
     return Div(
@@ -137,10 +144,10 @@ def sunshine_manager_content():
     ), Div(
         Br(),
         _reload,
-        Div (
-            Ul(*gamedb()),
-            cls='list-group'
-        )
+            Div (
+                Ul(*gamedb()),
+                cls='list-group'
+            )
     )
 
 # The Faq Page content is defined here
@@ -155,10 +162,7 @@ def faq_content():
     
     return Div(
         H1("FAQ"),
-        P(
-            _content,
-            cls='container'
-        )
+        Pre(_content)
     )
 
 # Define the routes for the application
