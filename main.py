@@ -24,19 +24,19 @@ def render(game):
                 game.game_name, 
                 cls='list-group-item border-end-0 d-inline-block text-truncate',
             ),
-            A(
+            Button(
                 'Add To Sunshine', hx_get=f'/add/{game.game_id}', target_id=f'appid-{game.game_id}', 
                 cls='btn btn-primary me-2'
             ),
-            A(
+            Button(
                 'Remove', hx_get=f'/remove/{game.game_id}', target_id=f'appid-{game.game_id}', 
                 cls='btn btn-danger me-2'
             ),
             Strong(
-                ('✅' if game.game_added else '❌'),
-                id=f'appid-{game.game_id}'
+                ('✅' if game.game_added else '❌')
             )
-        )
+        ),
+        id=f'appid-{game.game_id}', cls='row list-group-item border-top-0',
     )
 
 # Define the sidebar items
@@ -78,13 +78,15 @@ def logs_content():
     logs_dir = "/home/default/.cache/log"
     log_files = [f for f in os.listdir(logs_dir) if os.path.isfile(os.path.join(logs_dir, f)) and f.endswith('.log')]
     
+    sorted_log_files = sorted(log_files)
+
     divs = []
-    for log_file in log_files:
+    for log_file in sorted_log_files:
         file_path = os.path.join(logs_dir, log_file)
         with open(file_path, 'r') as file:
             lines = file.readlines()[-50:]
             content = "<br>".join(lines)
-            divs.append(Details(Summary(escape(log_file), role='button'), Pre(P(Markup(content)), cls='card')))
+            divs.append(Details(Summary(escape(log_file)), Pre(P(Markup(content)), cls='card')))
 
     return Div(*divs) if divs else Div("No log files found.")
 

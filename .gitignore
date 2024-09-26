@@ -30,3 +30,4 @@ __pycache__
 !.gitignore
 main2.py
 test.py
+alternate.py
