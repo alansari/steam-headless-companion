@@ -1,3 +1,3 @@
-Proof of concept for a possible way to manage steam-headless
+!!!Archived only for refrence!!!
 
-[POC.webm](https://github.com/user-attachments/assets/7fcea754-cd54-48f1-97b5-87f580c5e736)
+[Update 1.webm](https://github.com/user-attachments/assets/e7479ebc-5c37-45f0-9a4c-42f2aacd594e)
